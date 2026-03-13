@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JLB X1 Pro — Autonomous Cleaning System</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:16px}
+body{background:#f9f8f6;color:#1a1a1a;font-family:'DM Sans',sans-serif;font-weight:300;overflow-x:hidden}
+:root{
+  --bg:#f9f8f6;--bg2:#f2f0ec;--white:#ffffff;--black:#111111;--ink:#1a1a1a;
+  --mid:#555555;--light:#999999;--border:#e2e0dc;--border2:#d0cec8;--gold:#b8820a;
+  --t:.35s cubic-bezier(.4,0,.2,1);
+}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;height:60px;display:flex;align-items:center;padding:0 48px;background:rgba(249,248,246,0.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+.nav-logo{font-family:'DM Sans',sans-serif;font-weight:500;font-size:1.25rem;letter-spacing:.18em;color:var(--black);cursor:pointer;flex-shrink:0}
+.nav-tabs{display:flex;list-style:none;gap:0;margin:0 auto}
+.nav-tab-item{display:block;padding:0 28px;height:60px;line-height:60px;font-size:.7rem;font-weight:400;letter-spacing:.18em;text-transform:uppercase;color:var(--light);cursor:pointer;position:relative;transition:color var(--t);user-select:none}
+.nav-tab-item::after{content:'';position:absolute;bottom:0;left:28px;right:28px;height:2px;background:var(--black);transform:scaleX(0);transition:transform var(--t)}
+.nav-tab-item:hover{color:var(--black)}
+.nav-tab-item.active{color:var(--black);font-weight:500}
+.nav-tab-item.active::after{transform:scaleX(1)}
+.nav-buy{flex-shrink:0;font-size:.7rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--black);cursor:pointer;border-bottom:1px solid var(--black);padding-bottom:1px;transition:opacity var(--t);user-select:none}
+.nav-buy:hover{opacity:.5}
+
+/* SECTIONS */
+.page-section{display:none;min-height:100vh;padding-top:60px}
+.page-section.active{display:block}
+
+/* PILL */
+.pill{display:inline-block;padding:5px 18px;border:1px solid var(--border2);border-radius:40px;font-size:.62rem;letter-spacing:.25em;text-transform:uppercase;color:var(--mid);margin-bottom:28px;font-family:'DM Mono',monospace}
+
+/* TYPOGRAPHY */
+.display-title{font-family:'Playfair Display',serif;font-size:clamp(2.4rem,5vw,4.2rem);font-weight:700;line-height:1.1;color:var(--black);letter-spacing:-.01em}
+.display-title em{font-style:italic;font-weight:400}
+.display-sub{font-size:1rem;color:var(--mid);line-height:1.75;max-width:540px;margin-top:20px}
+.label-sm{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.3em;text-transform:uppercase;color:var(--light)}
+
+/* BUTTONS */
+.btn{display:inline-block;padding:13px 30px;font-size:.72rem;font-weight:500;letter-spacing:.14em;text-transform:uppercase;border-radius:3px;transition:var(--t);cursor:pointer;border:none;user-select:none}
+.btn-dark{background:var(--black);color:var(--white)}
+.btn-dark:hover{background:#333}
+.btn-outline-dark{background:transparent;color:var(--black);border:1px solid var(--border2)}
+.btn-outline-dark:hover{border-color:var(--black)}
+
+/* OVERVIEW */
+.ov-hero{min-height:calc(100vh - 60px);display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:80px 80px 120px;gap:60px;position:relative;overflow:hidden}
+.ov-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 65% 40%,#ece8e0,transparent 65%),var(--bg);z-index:0}
+.ov-hero>*{position:relative;z-index:1}
+.ov-hero-actions{display:flex;gap:14px;margin-top:36px;flex-wrap:wrap}
+.ov-hero-robot{display:flex;align-items:center;justify-content:center}
+.ov-hero-robot svg{animation:floatRobot 6s ease-in-out infinite;filter:drop-shadow(0 24px 48px rgba(0,0,0,.14)) drop-shadow(0 4px 16px rgba(0,0,0,.08))}
+@keyframes floatRobot{0%,100%{transform:translateY(0)}50%{transform:translateY(-16px)}}
+
+.ov-stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border)}
+.ov-stat{padding:32px 40px;border-right:1px solid var(--border)}
+.ov-stat:last-child{border-right:none}
+.ov-stat-num{font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:700;color:var(--black);line-height:1}
+.ov-stat-num sup{font-size:1rem;font-weight:400}
+.ov-stat-label{font-size:.68rem;color:var(--light);letter-spacing:.15em;text-transform:uppercase;margin-top:6px;font-family:'DM Mono',monospace}
+
+.ov-features{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.ov-feat{background:var(--bg);padding:48px 40px;transition:background var(--t)}
+.ov-feat:hover{background:var(--white)}
+.ov-feat-icon{font-size:1.6rem;margin-bottom:18px;display:block}
+.ov-feat-name{font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:700;color:var(--black);margin-bottom:10px}
+.ov-feat-desc{font-size:.85rem;color:var(--mid);line-height:1.7}
+
+.ov-promise{display:grid;grid-template-columns:1fr 1fr;min-height:480px}
+.ov-promise-left{background:var(--black);padding:80px;display:flex;flex-direction:column;justify-content:space-between}
+.ov-promise-left .display-title{color:var(--white)}
+.ov-promise-left .display-title em{color:#d4a832}
+.ov-promise-left .display-sub{color:#888}
+.ov-promise-right{background:var(--bg2);padding:80px;display:flex;flex-direction:column;justify-content:center;gap:24px}
+.promise-item{display:flex;gap:20px;align-items:flex-start;padding-bottom:24px;border-bottom:1px solid var(--border)}
+.promise-item:last-child{border-bottom:none;padding-bottom:0}
+.pi-num{font-family:'DM Mono',monospace;font-size:.6rem;color:var(--light);width:28px;flex-shrink:0;padding-top:3px}
+.pi-name{font-weight:500;color:var(--black);font-size:.9rem;margin-bottom:4px}
+.pi-desc{font-size:.82rem;color:var(--mid);line-height:1.6}
+
+/* IN ACTION */
+.ia-hero{padding:100px 80px 60px;text-align:center;border-bottom:1px solid var(--border)}
+.ia-hero .display-title{max-width:700px;margin:0 auto}
+.ia-hero .display-sub{margin:20px auto 0;max-width:580px;text-align:center}
+.ia-tabs{display:flex;justify-content:center;gap:0;padding:0 80px;border-bottom:1px solid var(--border);background:var(--white);position:sticky;top:60px;z-index:50}
+.ia-tab{padding:18px 28px;font-size:.68rem;font-weight:400;letter-spacing:.16em;text-transform:uppercase;color:var(--light);cursor:pointer;border-bottom:2px solid transparent;transition:color var(--t),border-color var(--t);background:none;border-top:none;border-left:none;border-right:none;font-family:'DM Sans',sans-serif}
+.ia-tab.active{color:var(--black);border-bottom-color:var(--black);font-weight:500}
+.ia-tab:hover{color:var(--black)}
+.ia-scene{display:none;padding:80px}
+.ia-scene.active{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.ia-scene-text .pill{margin-bottom:20px}
+.ia-scene-text .display-title{font-size:clamp(2rem,3.5vw,3rem)}
+.ia-scene-text .display-sub{max-width:440px}
+.ia-bullets{margin-top:32px;display:flex;flex-direction:column;gap:14px}
+.ia-bullet{display:flex;gap:14px;align-items:flex-start}
+.ia-bullet-dot{width:6px;height:6px;border-radius:50%;background:var(--black);flex-shrink:0;margin-top:7px}
+.ia-bullet-text{font-size:.88rem;color:var(--mid);line-height:1.6}
+.ia-visual{background:var(--bg2);border-radius:16px;overflow:hidden;aspect-ratio:1;display:flex;align-items:center;justify-content:center;position:relative}
+
+/* SPECS */
+.sp-hero{padding:100px 80px 60px;border-bottom:1px solid var(--border)}
+.sp-hero .display-title{max-width:600px}
+.sp-layout{display:grid;grid-template-columns:320px 1fr;min-height:calc(100vh - 280px)}
+.sp-sidebar{border-right:1px solid var(--border);padding:40px 0;position:sticky;top:60px;align-self:start;height:calc(100vh - 60px);overflow-y:auto}
+.sp-sidecat{padding:10px 40px;font-size:.65rem;letter-spacing:.25em;text-transform:uppercase;color:var(--light);font-family:'DM Mono',monospace;margin-bottom:4px;margin-top:16px}
+.sp-sidecat:first-child{margin-top:0}
+.sp-sidelink{display:block;padding:11px 40px;font-size:.84rem;color:var(--mid);cursor:pointer;transition:color var(--t),background var(--t);border:none;background:none;width:100%;text-align:left;font-family:'DM Sans',sans-serif}
+.sp-sidelink:hover{color:var(--black);background:var(--bg2)}
+.sp-sidelink.active{color:var(--black);font-weight:500;background:var(--white);border-right:2px solid var(--black)}
+.sp-content{padding:60px 80px}
+.sp-section{display:none}
+.sp-section.active{display:block}
+.sp-section-title{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--black);margin-bottom:32px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.spec-table{width:100%;border-collapse:collapse;margin-bottom:48px}
+.spec-table tr{border-bottom:1px solid var(--border)}
+.spec-table tr:first-child{border-top:1px solid var(--border)}
+.spec-table td{padding:16px 0;vertical-align:top}
+.spec-table td:first-child{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--light);width:200px;padding-right:24px;padding-top:18px}
+.spec-table td:last-child{font-size:.92rem;color:var(--black);line-height:1.6}
+.spec-val-main{font-weight:500;color:var(--black)}
+.spec-val-sub{font-size:.82rem;color:var(--mid);margin-top:2px}
+.sp-colourways{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-bottom:48px}
+.sp-cw{padding:48px 40px;display:flex;align-items:center;gap:24px}
+.sp-cw.dark{background:var(--black)}
+.sp-cw.light{background:var(--bg2)}
+.sp-cw-swatch{width:52px;height:52px;border-radius:50%;flex-shrink:0}
+.sp-cw-name{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700}
+.sp-cw.dark .sp-cw-name{color:var(--white)}
+.sp-cw.dark .sp-cw-sub{color:#666}
+.sp-cw.light .sp-cw-name{color:var(--black)}
+.sp-cw.light .sp-cw-sub{color:var(--mid)}
+.sp-cw-sub{font-size:.8rem;margin-top:4px}
+
+/* APP */
+.app-hero{padding:100px 80px 60px;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;border-bottom:1px solid var(--border)}
+.app-hero-text .display-sub{max-width:400px}
+.phone-wrap{display:flex;align-items:center;justify-content:center;gap:24px}
+.phone{width:180px;background:var(--black);border-radius:32px;overflow:hidden;padding:16px 12px;position:relative;box-shadow:0 32px 80px rgba(0,0,0,.22)}
+.phone-notch{width:60px;height:10px;background:#1a1a1a;border-radius:5px;margin:0 auto 16px}
+.phone-screen{background:var(--bg);border-radius:18px;overflow:hidden;padding:16px 14px;min-height:320px}
+.phone-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.phone-nav-dot{width:6px;height:6px;border-radius:50%;background:var(--border2)}
+.phone-title{font-size:.55rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--black);margin-bottom:12px}
+.phone-card{background:var(--white);border-radius:10px;padding:12px;margin-bottom:8px;border:1px solid var(--border)}
+.phone-card-label{font-size:.45rem;letter-spacing:.15em;text-transform:uppercase;color:var(--light);margin-bottom:4px;font-family:'DM Mono',monospace}
+.phone-card-val{font-size:.72rem;font-weight:500;color:var(--black)}
+.phone-bar-wrap{background:var(--bg2);border-radius:4px;height:5px;margin-top:6px;overflow:hidden}
+.phone-bar{height:100%;border-radius:4px;background:var(--black)}
+.phone-mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.phone-mode-btn{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:8px 6px;text-align:center;font-size:.42rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mid)}
+.phone-mode-btn.on{background:var(--black);color:var(--white);border-color:var(--black)}
+.phone.small{width:140px;margin-top:40px}
+.phone.small .phone-screen{min-height:240px}
+.app-features{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--border);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.app-feat{background:var(--bg);padding:48px 48px;transition:background var(--t)}
+.app-feat:hover{background:var(--white)}
+.app-feat-icon{font-size:1.4rem;margin-bottom:16px;display:block}
+.app-feat-name{font-size:1rem;font-weight:500;color:var(--black);margin-bottom:8px}
+.app-feat-desc{font-size:.84rem;color:var(--mid);line-height:1.7}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-d1{transition-delay:.08s}.reveal-d2{transition-delay:.16s}.reveal-d3{transition-delay:.24s}.reveal-d4{transition-delay:.32s}.reveal-d5{transition-delay:.4s}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.ani-1{opacity:0;animation:fadeUp .7s .1s forwards}
+.ani-2{opacity:0;animation:fadeUp .7s .25s forwards}
+.ani-3{opacity:0;animation:fadeUp .7s .4s forwards}
+.ani-4{opacity:0;animation:fadeUp .7s .55s forwards}
+</style>
+</head>
+<body>
+
+<!-- CHECKOUT MODAL -->
+<div id="checkout-overlay" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);align-items:center;justify-content:center;">
+  <div style="background:#f9f8f6;width:100%;max-width:520px;border-radius:16px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.28);margin:16px;position:relative;">
+    <div style="padding:28px 36px 0;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.25em;text-transform:uppercase;color:#999;margin-bottom:4px">JLB X1 Pro</div>
+        <div style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:#111">Checkout</div>
+      </div>
+      <button onclick="closeCheckout()" style="background:none;border:none;cursor:pointer;font-size:1.2rem;color:#aaa;line-height:1;padding:4px">✕</button>
+    </div>
+    <div style="display:flex;gap:0;padding:24px 36px 0">
+      <div id="ind-1" style="flex:1;text-align:center;padding-bottom:10px;border-bottom:2px solid #111;font-size:.6rem;font-family:'DM Mono',monospace;letter-spacing:.15em;color:#111;transition:all .3s">01 · YOU</div>
+      <div id="ind-2" style="flex:1;text-align:center;padding-bottom:10px;border-bottom:2px solid #ddd;font-size:.6rem;font-family:'DM Mono',monospace;letter-spacing:.15em;color:#bbb;transition:all .3s">02 · DELIVERY</div>
+      <div id="ind-3" style="flex:1;text-align:center;padding-bottom:10px;border-bottom:2px solid #ddd;font-size:.6rem;font-family:'DM Mono',monospace;letter-spacing:.15em;color:#bbb;transition:all .3s">03 · PAYMENT</div>
+    </div>
+    <!-- Step 1 -->
+    <div id="ck-step-1" style="padding:28px 36px 36px">
+      <p style="font-size:.82rem;color:#777;margin-bottom:24px;line-height:1.6">Let's start with your details.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+        <div><label style="font-size:.6rem;font-family:'DM Mono',monospace;letter-spacing:.18em;color:#999;text-transform:uppercase;display:block;margin-bottom:6px">First Name</label><input type="text" placeholder="Jane" style="width:100%;padding:11px 14px;border:1px solid #ddd;border-radius:6px;font-size:.88rem;font-family:'DM Sans',sans-serif;background:#fff;outline:none" /></div>
+        <div><label style="font-size:.6rem;font-family:'DM Mono',monospace;letter-spacing:.18em;color:#999;text-transform:uppercase;display:block;margin-bottom:6px">Last Name</label><input type="text" placeholder="Smith" style="width:100%;padding:11px 14px;border:1px solid #ddd;border-radius:6px;font-size:.88rem;font-family:'DM Sans',sans-serif;background:#fff;outline:none" /></div>
+      </div>
+      <div style="margin-bottom:14px"><label style="font-size:.6rem;font-family:'DM Mono',monospace;letter-spacing:.18em;color:#999;text-transform:uppercase;display:block;margin-bottom:6px">Email</label><input type="email" placeholder="jane@example.com" style="width:100%;padding:11px 14px;border:1px solid #ddd;border-radius:6px;font-size:.88rem;font-family:'DM Sans',sans-serif;background:#fff;outline:none" /></div>
+      <div style="margin-bottom:28px"><label style="font-size:.6rem;font-family:'DM Mono',monospace;letter-spacing:.18em;color:#999;text-transform:uppercase;display:block;margin-bottom:6px">Phone</label><input type="tel" placeholder="+353 87 000 0000" style="width:100%;padding:11px 14px;border:1px solid #ddd;border-radius:6px;font-size:.88rem;font-family:'DM Sans',sans-serif;background:#fff;outline:none" /></div>
+      <button onclick="goStep(2)" class="btn btn-dark" style="width:100%;padding:14px;font-size:.72rem;border-radius:6px">Continue to Delivery →</button>
+    </div>
+    <!-- Step 2 -->
+    <div id="ck-step-2" style="display:none;padding:28px 36px 36px">
+      <p style="font-size:.82rem;color:#777;margin-bottom:24px;line-height:1.6">Free next-day delivery included.</p>
+      <div style="margin-bottom:14px"><label style="font-size:.6rem;font-family:'DM Mono',monospace;letter-spacing:.18em;color:#999;text-transform:uppercase;display:block;margin-bottom:6px">Address Line 1</label><input type="text" placeholder="12 Maple Avenue" style="width:100%;padding:11px 14px;border:1px solid #ddd;border-radius:6px;font-size:.88rem;font-family:'DM Sans',sans-serif;background:#fff;outline:none" /></div>
+      <div style="margin-bottom:14px"><label style="font-size:.6rem;font-family:'DM Mono',monospace;letter-spacing:.18em;color:#999;text-transform:uppercase;display:block;margin-bottom:6px">Address Line 2</label><input type="text" placeholder="Apartment, suite, etc." style="width:100%;padding:11px 14px;border:1px solid #ddd;border-radius:6px;font-size:.88rem;font-family:'DM Sans',sans-serif;background:#fff;outline:none" /></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+        <div><label style="font-size:.6rem;font-family:'DM Mono',monospace;letter-spacing:.18em;color:#999;text-transform:uppercase;display:block;margin-bottom:6px">City</label><input type="text" placeholder="Dublin" style="width:100%;padding:11px 14px;border:1px solid #ddd;border-radius:6px;font-size:.88rem;font-family:'DM Sans',sans-serif;background:#fff;outline:none" /></div>
+        <div><label style="font-size:.6rem;font-family:'DM Mono',monospace;letter-spacing:.18em;color:#999;text-transform:uppercase;display:block;margin-bottom:6px">Eircode</label><input type="text" placeholder="D01 AB12" style="width:100%;padding:11px 14px;border:1px solid #ddd;border-radius:6px;font-size:.88rem;font-family:'DM Sans',sans-serif;background:#fff;outline:none" /></div>
+      </div>
+      <div style="margin-bottom:28px"><label style="font-size:.6rem;font-family:'DM Mono',monospace;letter-spacing:.18em;color:#999;text-transform:uppercase;display:block;margin-bottom:6px">Country</label><select style="width:100%;padding:11px 14px;border:1px solid #ddd;border-radius:6px;font-size:.88rem;font-family:'DM Sans',sans-serif;background:#fff;outline:none;color:#111"><option>Ireland</option><option>United Kingdom</option><option>Germany</option><option>France</option><option>Netherlands</option><option>Spain</option><option>Italy</option></select></div>
+      <div style="display:flex;gap:12px">
+        <button onclick="goStep(1)" class="btn btn-outline-dark" style="padding:14px 20px;font-size:.72rem;border-radius:6px">← Back</button>
+        <button onclick="goStep(3)" class="btn btn-dark" style="flex:1;padding:14px;font-size:.72rem;border-radius:6px">Continue to Payment →</button>
+      </div>
+    </div>
+    <!-- Step 3 -->
+    <div id="ck-step-3" style="display:none;padding:28px 36px 36px">
+      <p style="font-size:.82rem;color:#777;margin-bottom:24px;line-height:1.6">Secure payment. Encrypted and never stored.</p>
+      <div style="margin-bottom:14px"><label style="font-size:.6rem;font-family:'DM Mono',monospace;letter-spacing:.18em;color:#999;text-transform:uppercase;display:block;margin-bottom:6px">Name on Card</label><input type="text" placeholder="Jane Smith" style="width:100%;padding:11px 14px;border:1px solid #ddd;border-radius:6px;font-size:.88rem;font-family:'DM Sans',sans-serif;background:#fff;outline:none" /></div>
+      <div style="margin-bottom:14px"><label style="font-size:.6rem;font-family:'DM Mono',monospace;letter-spacing:.18em;color:#999;text-transform:uppercase;display:block;margin-bottom:6px">Card Number</label><div style="position:relative"><input id="ck-cardnum" type="text" placeholder="1234 5678 9012 3456" maxlength="19" oninput="fmtCard(this)" style="width:100%;padding:11px 44px 11px 14px;border:1px solid #ddd;border-radius:6px;font-size:.88rem;font-family:'DM Mono',monospace;background:#fff;outline:none;letter-spacing:.05em" /><span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:1rem;opacity:.4">💳</span></div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:28px">
+        <div><label style="font-size:.6rem;font-family:'DM Mono',monospace;letter-spacing:.18em;color:#999;text-transform:uppercase;display:block;margin-bottom:6px">Expiry</label><input type="text" placeholder="MM / YY" maxlength="7" oninput="fmtExpiry(this)" style="width:100%;padding:11px 14px;border:1px solid #ddd;border-radius:6px;font-size:.88rem;font-family:'DM Mono',monospace;background:#fff;outline:none" /></div>
+        <div><label style="font-size:.6rem;font-family:'DM Mono',monospace;letter-spacing:.18em;color:#999;text-transform:uppercase;display:block;margin-bottom:6px">CVV</label><input type="text" placeholder="•••" maxlength="4" style="width:100%;padding:11px 14px;border:1px solid #ddd;border-radius:6px;font-size:.88rem;font-family:'DM Mono',monospace;background:#fff;outline:none" /></div>
+      </div>
+      <div style="background:#f2f0ec;border-radius:8px;padding:16px 18px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-size:.7rem;font-weight:500;color:#111" id="ck-summary-name">JLB X1 Pro · Pearl</div><div style="font-size:.65rem;color:#999;margin-top:2px">Free next-day delivery</div></div>
+        <div style="font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:#111">€999</div>
+      </div>
+      <div style="display:flex;gap:12px">
+        <button onclick="goStep(2)" class="btn btn-outline-dark" style="padding:14px 20px;font-size:.72rem;border-radius:6px">← Back</button>
+        <button onclick="placeOrder(this)" class="btn btn-dark" style="flex:1;padding:14px;font-size:.72rem;border-radius:6px">🔒 Place Order — €999</button>
+      </div>
+      <p style="font-size:.62rem;color:#ccc;text-align:center;margin-top:14px;font-family:'DM Mono',monospace;letter-spacing:.08em">256-BIT SSL ENCRYPTED · PCI DSS COMPLIANT</p>
+    </div>
+    <!-- Step 4 -->
+    <div id="ck-step-4" style="display:none;padding:48px 36px;text-align:center">
+      <div style="font-size:2.8rem;margin-bottom:20px">✅</div>
+      <div style="font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:#111;margin-bottom:12px">Order Placed!</div>
+      <p style="font-size:.88rem;color:#777;line-height:1.7;max-width:340px;margin:0 auto 32px">Your JLB X1 Pro is confirmed. Expected delivery: <strong style="color:#111">tomorrow before 12pm</strong>.</p>
+      <button onclick="closeCheckout()" class="btn btn-dark" style="padding:14px 36px;font-size:.72rem;border-radius:6px">Back to Site</button>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <span class="nav-logo" onclick="showTab('overview')">J L B</span>
+  <ul class="nav-tabs">
+    <li><span class="nav-tab-item active" id="tab-overview" onclick="showTab('overview')">Overview</span></li>
+    <li><span class="nav-tab-item" id="tab-inaction" onclick="showTab('inaction')">In Action</span></li>
+    <li><span class="nav-tab-item" id="tab-specs" onclick="showTab('specs')">Specs</span></li>
+    <li><span class="nav-tab-item" id="tab-app" onclick="showTab('app')">App</span></li>
+  </ul>
+  <span class="nav-buy" onclick="openCheckout('pearl')">Buy — €999</span>
+</nav>
+
+<!-- ═══ OVERVIEW ═══ -->
+<div id="section-overview" class="page-section active">
+  <div class="ov-hero">
+    <div>
+      <div class="pill ani-1">JLB X1 Pro · Autonomous Cleaning</div>
+      <h1 class="display-title ani-2">Your home.<br><em>Cleaned itself.</em></h1>
+      <p class="display-sub ani-3">The world's first autonomous system that vacuums, mops, cleans windows, purifies air and diffuses scent — powered by water it harvests from the air itself.</p>
+      <div class="ov-hero-actions ani-4">
+        <button class="btn btn-dark" onclick="openCheckout()">Order Now — €999</button>
+        <button class="btn btn-outline-dark" onclick="showTab('inaction')">See It In Action</button>
+      </div>
+    </div>
+    <div class="ov-hero-robot ani-2">
+      <svg width="420" height="420" viewBox="0 0 420 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="ovBody" cx="36%" cy="28%" r="68%"><stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#d8d8d8"/></radialGradient>
+          <radialGradient id="ovLens" cx="32%" cy="28%"><stop offset="0%" stop-color="#1a6eb5"/><stop offset="60%" stop-color="#0a4888"/><stop offset="100%" stop-color="#041830"/></radialGradient>
+          <radialGradient id="ovInner" cx="40%" cy="35%" r="65%"><stop offset="0%" stop-color="#f2f2f2"/><stop offset="100%" stop-color="#e0e0e0"/></radialGradient>
+        </defs>
+        <ellipse cx="210" cy="400" rx="130" ry="14" fill="#000" opacity="0.07"/>
+        <ellipse cx="210" cy="210" rx="170" ry="170" fill="url(#ovBody)"/>
+        <ellipse cx="210" cy="210" rx="170" ry="170" fill="none" stroke="#d0d0d0" stroke-width="1.5"/>
+        <ellipse cx="155" cy="148" rx="65" ry="30" fill="white" opacity="0.5" transform="rotate(-28 155 148)"/>
+        <ellipse cx="148" cy="140" rx="35" ry="14" fill="white" opacity="0.35" transform="rotate(-28 148 140)"/>
+        <path d="M82 172 A133 133 0 0 1 338 172" stroke="#d8d8d8" stroke-width="14" fill="none" stroke-linecap="round"/>
+        <path d="M87 172 A128 128 0 0 1 333 172" stroke="#e8e8e8" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <rect x="193" y="67" width="34" height="26" rx="7" fill="#ebebeb" stroke="#d8d8d8" stroke-width="1.2"/>
+        <rect x="197" y="71" width="26" height="18" rx="5" fill="#e4e4e4"/>
+        <circle cx="210" cy="80" r="6" fill="url(#ovLens)"/>
+        <circle cx="210" cy="80" r="2.5" fill="#1a6eb5" opacity="0.6"/>
+        <circle cx="210" cy="80" r="1" fill="#fff" opacity="0.7"/>
+        <ellipse cx="210" cy="218" rx="126" ry="124" fill="url(#ovInner)" stroke="#d8d8d8" stroke-width="1"/>
+        <text x="210" y="192" font-family="'DM Mono',monospace" font-size="22" fill="#c8c8c8" text-anchor="middle" letter-spacing="11" font-weight="400">JLB</text>
+        <circle cx="210" cy="224" r="22" fill="#eaeaea" stroke="#d8d8d8" stroke-width="1.5"/>
+        <circle cx="210" cy="224" r="15" fill="#e2e2e2"/>
+        <path d="M210 215 L210 221" stroke="#1a6eb5" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M202.5 218 A9 9 0 1 0 217.5 218" stroke="#1a6eb5" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <circle cx="294" cy="175" r="5" fill="#eaeaea" stroke="#d8d8d8"/>
+        <circle cx="294" cy="175" r="3" fill="#1a6eb5" opacity="0.9"/>
+        <circle cx="210" cy="270" r="24" fill="#e4e4e4" stroke="#d8d8d8" stroke-width="1.5"/>
+        <circle cx="210" cy="270" r="16" fill="#dcdcdc" stroke="#d0d0d0"/>
+        <circle cx="210" cy="270" r="7" fill="#d4d4d4"/>
+        <ellipse cx="157" cy="352" rx="48" ry="11" fill="#dcdcdc" stroke="#cccccc"/>
+        <ellipse cx="263" cy="352" rx="48" ry="11" fill="#dcdcdc" stroke="#cccccc"/>
+        <ellipse cx="210" cy="352" rx="28" ry="8" fill="#d0d0d0" stroke="#c8c8c8"/>
+        <rect x="147" y="178" width="4" height="66" rx="2" fill="#1a6eb5" opacity="0.4"/>
+        <rect x="249" y="178" width="4" height="66" rx="2" fill="#1a6eb5" opacity="0.4"/>
+        <g opacity="0.2"><line x1="210" y1="32" x2="210" y2="44" stroke="#1a6eb5" stroke-width="1.5" stroke-linecap="round"/><line x1="247" y1="43" x2="243" y2="52" stroke="#1a6eb5" stroke-width="1.5" stroke-linecap="round"/><line x1="173" y1="43" x2="177" y2="52" stroke="#1a6eb5" stroke-width="1.5" stroke-linecap="round"/></g>
+      </svg>
+    </div>
+  </div>
+
+  <div class="ov-stats">
+    <div class="ov-stat reveal"><div class="ov-stat-num">4200<sup>Pa</sup></div><div class="ov-stat-label">Suction Power</div></div>
+    <div class="ov-stat reveal reveal-d1"><div class="ov-stat-num">6</div><div class="ov-stat-label">Cleaning Modes</div></div>
+    <div class="ov-stat reveal reveal-d2"><div class="ov-stat-num">380<sup>m²</sup></div><div class="ov-stat-label">Per Charge</div></div>
+    <div class="ov-stat reveal reveal-d3"><div class="ov-stat-num">48<sup>dB</sup></div><div class="ov-stat-label">Ultra Quiet</div></div>
+  </div>
+
+  <div class="ov-features">
+    <div class="ov-feat reveal"><span class="ov-feat-icon">🌀</span><div class="ov-feat-name">Vacuum</div><p class="ov-feat-desc">4200 Pa dual-channel suction clears dust, debris and pet hair from every floor type — scheduled or on demand.</p></div>
+    <div class="ov-feat reveal reveal-d1"><span class="ov-feat-icon">💧</span><div class="ov-feat-name">Mop</div><p class="ov-feat-desc">Dual oscillating pads remove dried spills. Water is supplied by the onboard atmospheric dehumidifier — never refilled by hand.</p></div>
+    <div class="ov-feat reveal reveal-d2"><span class="ov-feat-icon">🔲</span><div class="ov-feat-name">Windows</div><p class="ov-feat-desc">Patented track rail system lets the X1 Pro traverse every pane with 8.5N grip. Streak-free, every time, entirely autonomously.</p></div>
+    <div class="ov-feat reveal reveal-d3"><span class="ov-feat-icon">🌿</span><div class="ov-feat-name">Air</div><p class="ov-feat-desc">4-stage HEPA + activated carbon captures 99.97% of particles ≥0.3μm. Your robot is also your home's air purifier.</p></div>
+    <div class="ov-feat reveal reveal-d4"><span class="ov-feat-icon">✨</span><div class="ov-feat-name">Scent</div><p class="ov-feat-desc">A 6-position carousel and micro-diffuser ports let you schedule fragrancing by room. Six signature JLB scents included.</p></div>
+    <div class="ov-feat reveal reveal-d5"><span class="ov-feat-icon">⚡</span><div class="ov-feat-name">Smart Dock</div><p class="ov-feat-desc">Auto-empties, washes and UV-dries mop pads, tops up water, refills scent, fast-charges. Zero maintenance required.</p></div>
+  </div>
+
+  <div class="ov-promise">
+    <div class="ov-promise-left reveal">
+      <div>
+        <div class="pill" style="border-color:#333;color:#888;background:transparent">JLB X1 Pro · Design</div>
+        <h2 class="display-title" style="margin-top:16px">Every detail<br>considered.<br><em>Nothing wasted.</em></h2>
+        <p class="display-sub" style="margin-top:16px">Obsidian gloss black with gold hardware. Pearl gloss white with blue hardware.</p>
+      </div>
+      <div style="margin-top:40px;display:flex;gap:16px">
+        <button class="btn" style="background:white;color:#111;font-size:.7rem;padding:12px 24px" onclick="showTab('specs')">View Specs</button>
+        <button class="btn" style="background:transparent;color:#888;border:1px solid #333;font-size:.7rem;padding:12px 24px" onclick="showTab('inaction')">See In Action</button>
+      </div>
+    </div>
+    <div class="ov-promise-right reveal reveal-d2">
+      <div class="promise-item"><span class="pi-num">01</span><div><div class="pi-name">Atmospheric Water Harvest</div><div class="pi-desc">A built-in dehumidifier harvests water from household air — the mop and window cleaner are self-refilling, indefinitely.</div></div></div>
+      <div class="promise-item"><span class="pi-num">02</span><div><div class="pi-name">Window Cleaning Track Rail</div><div class="pi-desc">A discreet aluminium rail fits beneath your window sill. The X1 Pro attaches, traverses, detaches — entirely autonomously.</div></div></div>
+      <div class="promise-item"><span class="pi-num">03</span><div><div class="pi-name">LiDAR + AI Vision</div><div class="pi-desc">360° LiDAR and a computer vision NPU build a complete room map. Obstacles are identified and avoided in real time.</div></div></div>
+      <div class="promise-item"><span class="pi-num">04</span><div><div class="pi-name">Fully Automated Dock</div><div class="pi-desc">Auto-empty, mop wash, UV sterilise, water refill, scent reload, fast charge — the dock services the robot so you never have to.</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ IN ACTION ═══ -->
+<div id="section-inaction" class="page-section">
+  <div class="ia-hero">
+    <div class="pill ani-1">JLB X1 Pro · Performance</div>
+    <h1 class="display-title ani-2">Every surface.<br><strong>Every task. Effortlessly.</strong></h1>
+    <p class="display-sub ani-3">The JLB X1 Pro adapts to six distinct cleaning and air-care modes — autonomously, intelligently, and completely on its own.</p>
+  </div>
+  <div class="ia-tabs">
+    <button class="ia-tab active" onclick="showMode('vacuum',this)">Vacuum</button>
+    <button class="ia-tab" onclick="showMode('mop',this)">Mop</button>
+    <button class="ia-tab" onclick="showMode('windows',this)">Windows</button>
+    <button class="ia-tab" onclick="showMode('air',this)">Air</button>
+    <button class="ia-tab" onclick="showMode('scent',this)">Scent</button>
+    <button class="ia-tab" onclick="showMode('dock',this)">Dock</button>
+  </div>
+
+  <!-- Vacuum -->
+  <div class="ia-scene active" id="mode-vacuum">
+    <div class="ia-scene-text">
+      <div class="pill">Mode 01 · Vacuum</div>
+      <h2 class="display-title">Invisible.<br>Inevitable.<br><em>Clean.</em></h2>
+      <p class="display-sub">4200 Pa dual-channel suction tackles everything from fine dust to debris and pet hair — on hardwood, tile and carpet alike.</p>
+      <div class="ia-bullets">
+        <div class="ia-bullet"><div class="ia-bullet-dot"></div><span class="ia-bullet-text">4200 Pa dual-channel motor — 40% more powerful than closest competitor</span></div>
+        <div class="ia-bullet"><div class="ia-bullet-dot"></div><span class="ia-bullet-text">Adaptive floor detection switches mode automatically between surface types</span></div>
+        <div class="ia-bullet"><div class="ia-bullet-dot"></div><span class="ia-bullet-text">LiDAR room mapping ensures full coverage — no missed strips, no double-passes</span></div>
+        <div class="ia-bullet"><div class="ia-bullet-dot"></div><span class="ia-bullet-text">48 dB — quieter than normal conversation, fully schedulable overnight</span></div>
+      </div>
+    </div>
+    <div class="ia-visual">
+      <svg viewBox="0 0 440 440" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+        <defs><radialGradient id="vbg" cx="50%" cy="60%" r="60%"><stop offset="0%" stop-color="#e8e4dc"/><stop offset="100%" stop-color="#f2f0ec"/></radialGradient><radialGradient id="vrob" cx="36%" cy="28%" r="68%"><stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#d8d8d8"/></radialGradient></defs>
+        <rect width="440" height="440" fill="url(#vbg)"/>
+        <line x1="0" y1="280" x2="440" y2="280" stroke="#e0ddd6" stroke-width="0.8"/>
+        <line x1="0" y1="320" x2="440" y2="320" stroke="#e0ddd6" stroke-width="0.8"/>
+        <line x1="0" y1="360" x2="440" y2="360" stroke="#e0ddd6" stroke-width="0.8"/>
+        <circle cx="120" cy="310" r="3" fill="#c8c0b0" opacity="0.6"/><circle cx="180" cy="295" r="2" fill="#c8c0b0" opacity="0.5"/><circle cx="90" cy="340" r="2.5" fill="#c8c0b0" opacity="0.4"/><circle cx="360" cy="300" r="2" fill="#c8c0b0" opacity="0.5"/>
+        <path d="M220 295 Q180 290 150 310" stroke="#1a6eb5" stroke-width="1.5" fill="none" stroke-dasharray="4,4" opacity="0.3"/>
+        <g transform="translate(220,262)">
+          <ellipse cx="0" cy="12" rx="72" ry="14" fill="#000" opacity="0.06"/>
+          <ellipse cx="0" cy="0" rx="72" ry="72" fill="url(#vrob)"/><ellipse cx="0" cy="0" rx="72" ry="72" fill="none" stroke="#d8d8d8" stroke-width="1.5"/>
+          <ellipse cx="-22" cy="-22" rx="30" ry="15" fill="white" opacity="0.5" transform="rotate(-25 -22 -22)"/>
+          <path d="M-57 -33 A72 72 0 0 1 57 -33" stroke="#d8d8d8" stroke-width="10" fill="none" stroke-linecap="round"/>
+          <rect x="-12" y="-50" width="24" height="18" rx="5" fill="#ebebeb" stroke="#d8d8d8"/><circle cx="0" cy="-41" r="4" fill="#1a6eb5" opacity="0.8"/>
+          <ellipse cx="0" cy="6" rx="49" ry="49" fill="#f0f0f0" stroke="#e4e4e4"/>
+          <text x="0" y="-2" font-family="'DM Mono',monospace" font-size="10" fill="#c0c0c0" text-anchor="middle" letter-spacing="4">JLB</text>
+          <circle cx="0" cy="12" r="14" fill="#eaeaea" stroke="#d8d8d8" stroke-width="1.5"/>
+          <path d="M0 5 L0 10" stroke="#1a6eb5" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M-5.5 8 A6.5 6.5 0 1 0 5.5 8" stroke="#1a6eb5" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+          <circle cx="32" cy="-10" r="3.5" fill="#1a6eb5" opacity="0.8"/>
+          <ellipse cx="-35" cy="60" rx="25" ry="6" fill="#e0e0e0" stroke="#d4d4d4"/><ellipse cx="35" cy="60" rx="25" ry="6" fill="#e0e0e0" stroke="#d4d4d4"/>
+          <circle cx="0" cy="35" r="14" fill="#e4e4e4" stroke="#d4d4d4" stroke-width="1.5"/><circle cx="0" cy="35" r="8" fill="#dcdcdc"/><circle cx="0" cy="35" r="3" fill="#d0d0d0"/>
+        </g>
+        <line x1="100" y1="262" x2="140" y2="262" stroke="#c8c0b8" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+        <line x1="110" y1="272" x2="144" y2="272" stroke="#c8c0b8" stroke-width="1" stroke-linecap="round" opacity="0.4"/>
+        <rect x="16" y="400" width="110" height="24" rx="12" fill="#111" opacity="0.06"/>
+        <text x="71" y="416" font-family="'DM Mono',monospace" font-size="8.5" fill="#555" text-anchor="middle" letter-spacing="2">VACUUM MODE</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Mop -->
+  <div class="ia-scene" id="mode-mop">
+    <div class="ia-scene-text">
+      <div class="pill">Mode 02 · Mop</div>
+      <h2 class="display-title">Wet clean.<br><em>No water<br>needed.</em></h2>
+      <p class="display-sub">Dual oscillating mop pads remove dried spills and grime. The onboard atmospheric dehumidifier harvests water from household air — the mop never needs to be refilled.</p>
+      <div class="ia-bullets">
+        <div class="ia-bullet"><div class="ia-bullet-dot"></div><span class="ia-bullet-text">Atmospheric dehumidifier produces up to 350 ml/hr — fully self-sufficient</span></div>
+        <div class="ia-bullet"><div class="ia-bullet-dot"></div><span class="ia-bullet-text">Dual oscillating pads with 400 RPM eccentric motion for deep scrubbing</span></div>
+        <div class="ia-bullet"><div class="ia-bullet-dot"></div><span class="ia-bullet-text">Variable moisture control — delicate for hardwood, full saturation for tile</span></div>
+        <div class="ia-bullet"><div class="ia-bullet-dot"></div><span class="ia-bullet-text">Dock auto-washes and UV-sterilises pads after every mopping session</span></div>
+      </div>
+    </div>
+    <div class="ia-visual" style="background:#eef2f8">
+      <svg viewBox="0 0 440 440" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+        <defs><radialGradient id="mrob" cx="36%" cy="28%" r="68%"><stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#d8d8d8"/></radialGradient></defs>
+        <rect width="440" height="440" fill="#eef2f8"/>
+        <line x1="0" y1="300" x2="440" y2="300" stroke="#dde4ee" stroke-width="0.8"/><line x1="0" y1="340" x2="440" y2="340" stroke="#dde4ee" stroke-width="0.8"/>
+        <ellipse cx="100" cy="296" rx="80" ry="6" fill="#1a6eb5" opacity="0.06"/>
+        <ellipse cx="80" cy="295" rx="5" ry="7" fill="#1a6eb5" opacity="0.18"/><ellipse cx="110" cy="290" rx="4" ry="5" fill="#1a6eb5" opacity="0.14"/><ellipse cx="60" cy="302" rx="3" ry="4" fill="#1a6eb5" opacity="0.12"/>
+        <g transform="translate(220,255)">
+          <ellipse cx="0" cy="12" rx="72" ry="14" fill="#000" opacity="0.05"/>
+          <ellipse cx="0" cy="0" rx="72" ry="72" fill="url(#mrob)"/><ellipse cx="0" cy="0" rx="72" ry="72" fill="none" stroke="#d8d8d8" stroke-width="1.5"/>
+          <ellipse cx="-22" cy="-22" rx="30" ry="15" fill="white" opacity="0.5" transform="rotate(-25 -22 -22)"/>
+          <path d="M-57 -33 A72 72 0 0 1 57 -33" stroke="#d8d8d8" stroke-width="10" fill="none" stroke-linecap="round"/>
+          <rect x="-12" y="-50" width="24" height="18" rx="5" fill="#ebebeb" stroke="#d8d8d8"/><circle cx="0" cy="-41" r="4" fill="#1a6eb5" opacity="0.8"/>
+          <ellipse cx="0" cy="6" rx="49" ry="49" fill="#f0f0f0" stroke="#e4e4e4"/>
+          <text x="0" y="-2" font-family="'DM Mono',monospace" font-size="10" fill="#c0c0c0" text-anchor="middle" letter-spacing="4">JLB</text>
+          <circle cx="0" cy="12" r="14" fill="#eaeaea" stroke="#d8d8d8" stroke-width="1.5"/>
+          <path d="M0 5 L0 10" stroke="#1a6eb5" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M-5.5 8 A6.5 6.5 0 1 0 5.5 8" stroke="#1a6eb5" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+          <circle cx="32" cy="-10" r="3.5" fill="#1a6eb5" opacity="0.8"/>
+          <ellipse cx="-36" cy="62" rx="28" ry="7" fill="#d8e8f8" stroke="#c0d4ec"/><ellipse cx="36" cy="62" rx="28" ry="7" fill="#d8e8f8" stroke="#c0d4ec"/>
+        </g>
+        <rect x="16" y="400" width="100" height="24" rx="12" fill="#1a6eb5" opacity="0.08"/>
+        <text x="66" y="416" font-family="'DM Mono',monospace" font-size="8.5" fill="#1a6eb5" text-anchor="middle" letter-spacing="2">MOP MODE</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Windows -->
+  <div class="ia-scene" id="mode-windows">
+    <div class="ia-scene-text">
+      <div class="pill">Mode 03 · Windows</div>
+      <h2 class="display-title">The only robot<br>that climbs<br><em>your windows.</em></h2>
+      <p class="display-sub">A discreet aluminium track rail mounts flush beneath any window sill. The X1 Pro attaches, traverses, cleans, and returns — no ladder, no streaks, no effort.</p>
+      <div class="ia-bullets">
+        <div class="ia-bullet"><div class="ia-bullet-dot"></div><span class="ia-bullet-text">8.5N suction grippers with fail-safe auto-detach at track end</span></div>
+        <div class="ia-bullet"><div class="ia-bullet-dot"></div><span class="ia-bullet-text">Works on standard, frosted, tinted and double-glazed panes</span></div>
+        <div class="ia-bullet"><div class="ia-bullet-dot"></div><span class="ia-bullet-text">Track rail mounts without drilling — adhesive and bracket included</span></div>
+        <div class="ia-bullet"><div class="ia-bullet-dot"></div><span class="ia-bullet-text">Harvested water only — no streaks, no cleaning agents required</span></div>
+      </div>
+    </div>
+    <div class="ia-visual" style="background:#e8eef8">
+      <svg viewBox="0 0 440 440" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="wwin" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#c8ddf0" stop-opacity="0.7"/><stop offset="100%" stop-color="#a8c8e8" stop-opacity="0.5"/></linearGradient><radialGradient id="wrob2" cx="36%" cy="28%" r="68%"><stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#d8d8d8"/></radialGradient></defs>
+        <rect width="440" height="440" fill="#e8eef8"/>
+        <rect x="60" y="30" width="320" height="280" rx="4" fill="#d0d8e8" stroke="#b8c8dc" stroke-width="2"/>
+        <rect x="62" y="32" width="157" height="276" rx="3" fill="#a8b8cc" opacity="0.5"/>
+        <text x="140" y="170" font-family="'DM Mono',monospace" font-size="8" fill="#ffffff40" text-anchor="middle" letter-spacing="1">BEFORE</text>
+        <rect x="222" y="32" width="157" height="276" rx="3" fill="url(#wwin)"/>
+        <text x="300" y="170" font-family="'DM Mono',monospace" font-size="8" fill="#ffffff88" text-anchor="middle" letter-spacing="1">AFTER</text>
+        <line x1="221" y1="32" x2="221" y2="308" stroke="#ffffff30" stroke-width="1.5" stroke-dasharray="5,4"/>
+        <rect x="60" y="304" width="320" height="9" rx="4.5" fill="#8899aa" stroke="#7788aa" stroke-width="1"/>
+        <text x="220" y="330" font-family="'DM Mono',monospace" font-size="7.5" fill="#8899aa" text-anchor="middle" letter-spacing="2.5">TRACK RAIL</text>
+        <g transform="translate(221,175)">
+          <ellipse cx="0" cy="0" rx="52" ry="52" fill="url(#wrob2)"/><ellipse cx="0" cy="0" rx="52" ry="52" fill="none" stroke="#d8d8d8" stroke-width="1.5"/>
+          <ellipse cx="-16" cy="-16" rx="22" ry="11" fill="white" opacity="0.55" transform="rotate(-25 -16 -16)"/>
+          <path d="M-41 -24 A52 52 0 0 1 41 -24" stroke="#ccc" stroke-width="7" fill="none" stroke-linecap="round"/>
+          <rect x="-9" y="-36" width="18" height="13" rx="4" fill="#ebebeb" stroke="#d8d8d8"/><circle cx="0" cy="-29" r="3.5" fill="#1a6eb5" opacity="0.8"/>
+          <ellipse cx="0" cy="5" rx="36" ry="36" fill="#f0f0f0" stroke="#e4e4e4"/>
+          <text x="0" y="-1" font-family="'DM Mono',monospace" font-size="7.5" fill="#c0c0c0" text-anchor="middle" letter-spacing="4">JLB</text>
+          <circle cx="0" cy="10" r="10" fill="#eaeaea" stroke="#d8d8d8" stroke-width="1.5"/>
+          <circle cx="26" cy="-8" r="3" fill="#00bb44" opacity="0.9"/>
+          <rect x="-14" y="40" width="10" height="16" rx="5" fill="#d4d4d4" stroke="#c4c4c4"/><rect x="4" y="40" width="10" height="16" rx="5" fill="#d4d4d4" stroke="#c4c4c4"/>
+          <ellipse cx="-58" cy="20" rx="4" ry="5.5" fill="#1a6eb5" opacity="0.3"/><ellipse cx="-72" cy="35" rx="3" ry="4" fill="#1a6eb5" opacity="0.22"/>
+        </g>
+        <line x1="100" y1="175" x2="155" y2="175" stroke="#8899aa" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+        <polygon points="155,171 165,175 155,179" fill="#8899aa" opacity="0.5"/>
+        <rect x="16" y="400" width="120" height="24" rx="12" fill="#1a6eb5" opacity="0.1"/>
+        <text x="76" y="416" font-family="'DM Mono',monospace" font-size="8.5" fill="#1a6eb5" text-anchor="middle" letter-spacing="2">WINDOW MODE</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Air -->
+  <div class="ia-scene" id="mode-air">
+    <div class="ia-scene-text">
+      <div class="pill">Mode 04 · Air Purification</div>
+      <h2 class="display-title">Breathe<br><em>better air.</em></h2>
+      <p class="display-sub">A 4-stage HEPA and activated carbon filtration system captures 99.97% of particles ≥0.3μm — including dust, pollen, VOCs, and pet dander.</p>
+      <div class="ia-bullets">
+        <div class="ia-bullet"><div class="ia-bullet-dot"></div><span class="ia-bullet-text">CADR 180 m³/hr — refreshes a standard living room every 18 minutes</span></div>
+        <div class="ia-bullet"><div class="ia-bullet-dot"></div><span class="ia-bullet-text">4-stage filtration: pre-filter, HEPA H13, activated carbon, ioniser</span></div>
+        <div class="ia-bullet"><div class="ia-bullet-dot"></div><span class="ia-bullet-text">Real-time PM2.5, PM10 and VOC sensors shown live in the app</span></div>
+        <div class="ia-bullet"><div class="ia-bullet-dot"></div><span class="ia-bullet-text">Auto-triggers purification mode when air quality degrades</span></div>
+      </div>
+    </div>
+    <div class="ia-visual" style="background:#eef6ee">
+      <svg viewBox="0 0 440 440" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+        <defs><radialGradient id="arob" cx="36%" cy="28%" r="68%"><stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#d8d8d8"/></radialGradient></defs>
+        <rect width="440" height="440" fill="#eef6ee"/>
+        <text x="80" y="200" font-family="'DM Mono',monospace" font-size="8" fill="#cc8844" text-anchor="middle" opacity="0.5">● PM2.5</text>
+        <text x="80" y="215" font-family="'DM Mono',monospace" font-size="8" fill="#cc8844" text-anchor="middle" opacity="0.5">● Pollen</text>
+        <text x="80" y="230" font-family="'DM Mono',monospace" font-size="8" fill="#cc8844" text-anchor="middle" opacity="0.5">● VOCs</text>
+        <circle cx="360" cy="200" r="40" fill="none" stroke="#44aa66" stroke-width="1" opacity="0.2"/><circle cx="360" cy="200" r="60" fill="none" stroke="#44aa66" stroke-width="1" opacity="0.15"/><circle cx="360" cy="200" r="80" fill="none" stroke="#44aa66" stroke-width="0.8" opacity="0.1"/>
+        <text x="360" y="196" font-family="'DM Mono',monospace" font-size="8" fill="#44aa66" text-anchor="middle" opacity="0.7">CLEAN</text>
+        <text x="360" y="208" font-family="'DM Mono',monospace" font-size="8" fill="#44aa66" text-anchor="middle" opacity="0.7">AIR ✓</text>
+        <g transform="translate(220,255)">
+          <ellipse cx="0" cy="12" rx="72" ry="14" fill="#000" opacity="0.05"/>
+          <ellipse cx="0" cy="0" rx="72" ry="72" fill="url(#arob)"/><ellipse cx="0" cy="0" rx="72" ry="72" fill="none" stroke="#d8d8d8" stroke-width="1.5"/>
+          <ellipse cx="-22" cy="-22" rx="30" ry="15" fill="white" opacity="0.5" transform="rotate(-25 -22 -22)"/>
+          <path d="M-57 -33 A72 72 0 0 1 57 -33" stroke="#d8d8d8" stroke-width="10" fill="none" stroke-linecap="round"/>
+          <rect x="-12" y="-50" width="24" height="18" rx="5" fill="#ebebeb" stroke="#d8d8d8"/><circle cx="0" cy="-41" r="4" fill="#44aa66" opacity="0.9"/>
+          <ellipse cx="0" cy="6" rx="49" ry="49" fill="#f0f0f0" stroke="#e4e4e4"/>
+          <text x="0" y="-2" font-family="'DM Mono',monospace" font-size="10" fill="#c0c0c0" text-anchor="middle" letter-spacing="4">JLB</text>
+          <circle cx="0" cy="12" r="14" fill="#eaeaea" stroke="#d8d8d8" stroke-width="1.5"/>
+          <path d="M0 5 L0 10" stroke="#44aa66" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M-5.5 8 A6.5 6.5 0 1 0 5.5 8" stroke="#44aa66" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+          <rect x="-56" y="-8" width="10" height="20" rx="3" fill="#e8e8e8" stroke="#d8d8d8"/><rect x="46" y="-8" width="10" height="20" rx="3" fill="#e8e8e8" stroke="#d8d8d8"/>
+          <ellipse cx="-35" cy="60" rx="25" ry="6" fill="#e0e0e0" stroke="#d4d4d4"/><ellipse cx="35" cy="60" rx="25" ry="6" fill="#e0e0e0" stroke="#d4d4d4"/>
+        </g>
+        <rect x="16" y="400" width="120" height="24" rx="12" fill="#44aa66" opacity="0.1"/>
+        <text x="76" y="416" font-family="'DM Mono',monospace" font-size="8.5" fill="#44aa66" text-anchor="middle" letter-spacing="2">AIR PURIFY MODE</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Scent -->
+  <div class="ia-scene" id="mode-scent">
+    <div class="ia-scene-text">
+      <div class="pill">Mode 05 · Scent</div>
+      <h2 class="display-title">Your home.<br><em>Always<br>inviting.</em></h2>
+      <p class="display-sub">Six micro-diffuser ports and a 6-position scent carousel let you schedule fragrancing by room, time of day, and intensity — all from the app.</p>
+      <div class="ia-bullets">
+        <div class="ia-bullet"><div class="ia-bullet-dot"></div><span class="ia-bullet-text">Six signature JLB scents — Lavender, Cedarwood, Citrus, Rose, Mint, Linen</span></div>
+        <div class="ia-bullet"><div class="ia-bullet-dot"></div><span class="ia-bullet-text">Room-by-room scheduling — morning citrus in kitchen, evening lavender in bedroom</span></div>
+        <div class="ia-bullet"><div class="ia-bullet-dot"></div><span class="ia-bullet-text">Dock auto-rotates carousel to next scheduled scent cartridge</span></div>
+        <div class="ia-bullet"><div class="ia-bullet-dot"></div><span class="ia-bullet-text">Each cartridge lasts 30 days — subscriptions available via app</span></div>
+      </div>
+    </div>
+    <div class="ia-visual" style="background:#f4eef8">
+      <svg viewBox="0 0 440 440" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+        <defs><radialGradient id="srob" cx="36%" cy="28%" r="68%"><stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#d8d8d8"/></radialGradient></defs>
+        <rect width="440" height="440" fill="#f4eef8"/>
+        <path d="M220 200 Q200 160 215 120 Q230 80 210 50" stroke="#cc88ff" stroke-width="2" fill="none" opacity="0.3" stroke-linecap="round"/>
+        <path d="M240 198 Q260 155 248 112 Q236 70 255 40" stroke="#ffaacc" stroke-width="1.5" fill="none" opacity="0.25" stroke-linecap="round"/>
+        <path d="M200 202 Q175 158 188 118 Q200 78 182 45" stroke="#ffcc44" stroke-width="1.5" fill="none" opacity="0.2" stroke-linecap="round"/>
+        <text x="215" y="44" font-family="'DM Mono',monospace" font-size="7" fill="#cc88ff" text-anchor="middle" opacity="0.6">Lavender</text>
+        <text x="265" y="35" font-family="'DM Mono',monospace" font-size="7" fill="#ffaacc" text-anchor="middle" opacity="0.6">Rose</text>
+        <text x="176" y="38" font-family="'DM Mono',monospace" font-size="7" fill="#ffcc44" text-anchor="middle" opacity="0.6">Citrus</text>
+        <g transform="translate(220,268)">
+          <ellipse cx="0" cy="12" rx="72" ry="14" fill="#000" opacity="0.05"/>
+          <ellipse cx="0" cy="0" rx="72" ry="72" fill="url(#srob)"/><ellipse cx="0" cy="0" rx="72" ry="72" fill="none" stroke="#d8d8d8" stroke-width="1.5"/>
+          <ellipse cx="-22" cy="-22" rx="30" ry="15" fill="white" opacity="0.5" transform="rotate(-25 -22 -22)"/>
+          <path d="M-57 -33 A72 72 0 0 1 57 -33" stroke="#d8d8d8" stroke-width="10" fill="none" stroke-linecap="round"/>
+          <rect x="-12" y="-50" width="24" height="18" rx="5" fill="#ebebeb" stroke="#d8d8d8"/><circle cx="0" cy="-41" r="4" fill="#cc88ff" opacity="0.9"/>
+          <ellipse cx="0" cy="6" rx="49" ry="49" fill="#f8f0f8" stroke="#e4d4f0"/>
+          <text x="0" y="-2" font-family="'DM Mono',monospace" font-size="10" fill="#d4b8e0" text-anchor="middle" letter-spacing="4">JLB</text>
+          <circle cx="0" cy="12" r="14" fill="#f0e8f8" stroke="#e0d0ec" stroke-width="1.5"/>
+          <path d="M0 5 L0 10" stroke="#cc88ff" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M-5.5 8 A6.5 6.5 0 1 0 5.5 8" stroke="#cc88ff" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+          <circle cx="-48" cy="-20" r="4" fill="#ead0f8" stroke="#d4b0ec"/><circle cx="48" cy="-20" r="4" fill="#ead0f8" stroke="#d4b0ec"/>
+          <ellipse cx="-35" cy="60" rx="25" ry="6" fill="#e8d8f4" stroke="#d8c8ec"/><ellipse cx="35" cy="60" rx="25" ry="6" fill="#e8d8f4" stroke="#d8c8ec"/>
+        </g>
+        <rect x="16" y="400" width="110" height="24" rx="12" fill="#cc88ff" opacity="0.1"/>
+        <text x="71" y="416" font-family="'DM Mono',monospace" font-size="8.5" fill="#aa66dd" text-anchor="middle" letter-spacing="2">SCENT MODE</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Dock -->
+  <div class="ia-scene" id="mode-dock">
+    <div class="ia-scene-text">
+      <div class="pill">Mode 06 · Smart Dock</div>
+      <h2 class="display-title">Returns.<br><em>Restores.<br>Ready.</em></h2>
+      <p class="display-sub">When the X1 Pro finishes its run it docks automatically. The station handles everything — empty, wash, sterilise, refill, charge. No human required.</p>
+      <div class="ia-bullets">
+        <div class="ia-bullet"><div class="ia-bullet-dot"></div><span class="ia-bullet-text">Auto-empty dustbin with 60-day capacity — 0 touchpoints between empties</span></div>
+        <div class="ia-bullet"><div class="ia-bullet-dot"></div><span class="ia-bullet-text">Hot-water mop wash + UV-C sterilisation eliminates 99.9% of bacteria</span></div>
+        <div class="ia-bullet"><div class="ia-bullet-dot"></div><span class="ia-bullet-text">Atmospheric harvester replenishes clean water tank overnight</span></div>
+        <div class="ia-bullet"><div class="ia-bullet-dot"></div><span class="ia-bullet-text">80% charge in 90 minutes — can interrupt clean for mid-session top-up</span></div>
+      </div>
+    </div>
+    <div class="ia-visual" style="background:#f0f0ec">
+      <svg viewBox="0 0 440 440" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+        <defs><radialGradient id="dkrob" cx="36%" cy="28%" r="68%"><stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#d8d8d8"/></radialGradient></defs>
+        <rect width="440" height="440" fill="#f0f0ec"/>
+        <rect x="100" y="295" width="240" height="100" rx="14" fill="#e8e8e4" stroke="#d8d8d4" stroke-width="1.5"/>
+        <rect x="104" y="299" width="232" height="92" rx="12" fill="#e4e4e0"/>
+        <rect x="120" y="315" width="70" height="10" rx="5" fill="#d8d8d4" stroke="#ccccc8"/>
+        <rect x="122" y="317" width="50" height="6" rx="3" fill="#111" opacity="0.8"/>
+        <text x="155" y="336" font-family="'DM Mono',monospace" font-size="6.5" fill="#999" text-anchor="middle" letter-spacing="1">CHARGING</text>
+        <rect x="120" y="345" width="26" height="40" rx="5" fill="#d0d8e8" stroke="#c0c8d8"/>
+        <text x="133" y="357" font-family="'DM Mono',monospace" font-size="5" fill="#8899aa" text-anchor="middle">CLEAN</text>
+        <rect x="120" y="362" width="26" height="20" rx="3" fill="#88aacc" opacity="0.5"/>
+        <rect x="152" y="345" width="26" height="40" rx="5" fill="#e0d8d0" stroke="#d0c8c0"/>
+        <text x="165" y="357" font-family="'DM Mono',monospace" font-size="5" fill="#998877" text-anchor="middle">DIRTY</text>
+        <circle cx="330" cy="355" r="28" fill="#e8e4f0" stroke="#d8d4ec"/>
+        <circle cx="330" cy="330" r="4.5" fill="#cc88ff" opacity="0.8"/><circle cx="343" cy="336" r="4.5" fill="#ffaacc" opacity="0.7"/><circle cx="347" cy="351" r="4.5" fill="#88ccff" opacity="0.7"/><circle cx="340" cy="364" r="4.5" fill="#ffcc44" opacity="0.8"/><circle cx="326" cy="368" r="4.5" fill="#88dd88" opacity="0.7"/><circle cx="315" cy="358" r="4.5" fill="#ff8844" opacity="0.7"/>
+        <circle cx="330" cy="355" r="9" fill="#ece8f0" stroke="#d8d4ec"/>
+        <rect x="196" y="310" width="60" height="50" rx="7" fill="#e0e0dc" stroke="#d0d0cc"/>
+        <text x="226" y="323" font-family="'DM Mono',monospace" font-size="6" fill="#aaa" text-anchor="middle" letter-spacing="1">DUSTBIN</text>
+        <rect x="200" y="332" width="52" height="24" rx="4" fill="#d8d8d4" opacity="0.6"/>
+        <ellipse cx="220" cy="297" rx="64" ry="7" fill="#d8d8d4"/>
+        <g transform="translate(220,252)">
+          <ellipse cx="0" cy="10" rx="64" ry="12" fill="#000" opacity="0.04"/>
+          <ellipse cx="0" cy="0" rx="64" ry="64" fill="url(#dkrob)"/><ellipse cx="0" cy="0" rx="64" ry="64" fill="none" stroke="#d8d8d8" stroke-width="1.5"/>
+          <ellipse cx="-20" cy="-20" rx="27" ry="13" fill="white" opacity="0.5" transform="rotate(-25 -20 -20)"/>
+          <path d="M-51 -29 A64 64 0 0 1 51 -29" stroke="#d8d8d8" stroke-width="9" fill="none" stroke-linecap="round"/>
+          <rect x="-10" y="-44" width="20" height="15" rx="4" fill="#ebebeb" stroke="#d8d8d8"/><circle cx="0" cy="-36" r="3.5" fill="#111" opacity="0.9"/>
+          <ellipse cx="0" cy="5" rx="43" ry="43" fill="#f0f0f0" stroke="#e4e4e4"/>
+          <text x="0" y="-2" font-family="'DM Mono',monospace" font-size="9" fill="#c0c0c0" text-anchor="middle" letter-spacing="4">JLB</text>
+          <circle cx="0" cy="10" r="12" fill="#eaeaea" stroke="#d8d8d8" stroke-width="1.5"/>
+          <path d="M0 4 L0 9" stroke="#111" stroke-width="2" stroke-linecap="round"/>
+          <path d="M-5 7 A6 6 0 1 0 5 7" stroke="#111" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <circle cx="29" cy="-9" r="3" fill="#00bb44" opacity="0.9"/>
+          <ellipse cx="-32" cy="52" rx="22" ry="5" fill="#e0e0e0" stroke="#d4d4d4"/><ellipse cx="32" cy="52" rx="22" ry="5" fill="#e0e0e0" stroke="#d4d4d4"/>
+        </g>
+        <rect x="16" y="400" width="110" height="24" rx="12" fill="#111" opacity="0.06"/>
+        <text x="71" y="416" font-family="'DM Mono',monospace" font-size="8.5" fill="#555" text-anchor="middle" letter-spacing="2">DOCK · SERVICING</text>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SPECS ═══ -->
+<div id="section-specs" class="page-section">
+  <div class="sp-hero">
+    <div class="pill ani-1">JLB X1 Pro · Full Specifications</div>
+    <h1 class="display-title ani-2">No compromises.<br><em>Engineered to the limit.</em></h1>
+    <p class="display-sub ani-3" style="margin-top:16px">Every number, every material, every tolerance — documented in full.</p>
+  </div>
+  <div class="sp-layout">
+    <div class="sp-sidebar">
+      <div class="sp-sidecat">Performance</div>
+      <button class="sp-sidelink active" onclick="showSpec('cleaning',this)">Cleaning System</button>
+      <button class="sp-sidelink" onclick="showSpec('navigation',this)">Navigation & AI</button>
+      <div class="sp-sidecat">Power & Connectivity</div>
+      <button class="sp-sidelink" onclick="showSpec('battery',this)">Battery & Power</button>
+      <button class="sp-sidelink" onclick="showSpec('connectivity',this)">Connectivity</button>
+      <div class="sp-sidecat">Design & Variants</div>
+      <button class="sp-sidelink" onclick="showSpec('physical',this)">Physical Design</button>
+      <button class="sp-sidelink" onclick="showSpec('colourways',this)">Colourways</button>
+      <div class="sp-sidecat">Purchase</div>
+      <button class="sp-sidelink" onclick="showSpec('pricing',this)">Pricing & In Box</button>
+    </div>
+    <div class="sp-content">
+      <div class="sp-section active" id="spec-cleaning">
+        <div class="sp-section-title">Cleaning System</div>
+        <table class="spec-table">
+          <tr><td>Vacuum</td><td><div class="spec-val-main">4200 Pa dual-channel</div><div class="spec-val-sub">Adaptive mode: hard floor / carpet auto-detect</div></td></tr>
+          <tr><td>Mop System</td><td><div class="spec-val-main">Dual oscillating pads · 400 RPM</div><div class="spec-val-sub">Variable moisture — hardwood safe to full saturation</div></td></tr>
+          <tr><td>Water Source</td><td><div class="spec-val-main">Atmospheric dehumidifier — self-filling</div><div class="spec-val-sub">Up to 350 ml/hr yield · 800 ml clean water tank</div></td></tr>
+          <tr><td>Window Cleaning</td><td><div class="spec-val-main">8.5N suction grippers · magnetic track rail</div><div class="spec-val-sub">Works on standard, frosted, tinted, double-glazed panes · No-drill mount</div></td></tr>
+          <tr><td>Air Purification</td><td><div class="spec-val-main">4-stage: pre-filter, HEPA H13, carbon, ioniser</div><div class="spec-val-sub">CADR 180 m³/hr · 99.97% capture ≥0.3μm</div></td></tr>
+          <tr><td>Scent System</td><td><div class="spec-val-main">6-position carousel · 6 micro-diffuser ports</div><div class="spec-val-sub">30-day cartridges · App-scheduled by room and time</div></td></tr>
+          <tr><td>Noise Level</td><td><div class="spec-val-main">48 dB (floor modes) · 52 dB (window mode)</div><div class="spec-val-sub">Measured at 1m · Quieter than normal conversation</div></td></tr>
+          <tr><td>Coverage</td><td><div class="spec-val-main">380 m² per full charge</div><div class="spec-val-sub">Auto-returns for mid-session charge if needed</div></td></tr>
+        </table>
+        <div class="sp-section-title" style="margin-top:32px">Dock Station</div>
+        <table class="spec-table">
+          <tr><td>Dustbin</td><td><div class="spec-val-main">Auto-empty · 60-day capacity bag</div></td></tr>
+          <tr><td>Mop Wash</td><td><div class="spec-val-main">Hot-water wash + UV-C sterilisation</div><div class="spec-val-sub">99.9% bacteria elimination · Auto-dry cycle</div></td></tr>
+          <tr><td>Water Tanks</td><td><div class="spec-val-main">Separate clean (800 ml) + dirty (600 ml)</div></td></tr>
+        </table>
+      </div>
+      <div class="sp-section" id="spec-navigation">
+        <div class="sp-section-title">Navigation & AI</div>
+        <table class="spec-table">
+          <tr><td>LiDAR</td><td><div class="spec-val-main">360° spinning · 0.2° angular resolution</div><div class="spec-val-sub">Full room map generated on first run · Cloud sync</div></td></tr>
+          <tr><td>AI Vision</td><td><div class="spec-val-main">Dedicated NPU · 30fps edge inference</div><div class="spec-val-sub">Object classification: furniture, shoes, cables, pets</div></td></tr>
+          <tr><td>Obstacle Avoidance</td><td><div class="spec-val-main">3D structured light + cliff sensors</div><div class="spec-val-sub">12cm cliff detection · Sub-3cm object clearance</div></td></tr>
+          <tr><td>Mapping</td><td><div class="spec-val-main">Multi-floor maps · Room labelling</div><div class="spec-val-sub">Virtual no-go zones · Selective room cleaning</div></td></tr>
+          <tr><td>Self-Localisation</td><td><div class="spec-val-main">SLAM (Simultaneous Localisation and Mapping)</div><div class="spec-val-sub">Re-locates after being moved or lifted</div></td></tr>
+        </table>
+      </div>
+      <div class="sp-section" id="spec-battery">
+        <div class="sp-section-title">Battery & Power</div>
+        <table class="spec-table">
+          <tr><td>Capacity</td><td><div class="spec-val-main">380 Wh lithium-ion</div></td></tr>
+          <tr><td>Runtime</td><td><div class="spec-val-main">Up to 5 hours (floor modes)</div><div class="spec-val-sub">3 hours window + floor combined</div></td></tr>
+          <tr><td>Charge Time</td><td><div class="spec-val-main">80% in 90 min · 100% in 140 min</div></td></tr>
+          <tr><td>Mid-session</td><td><div class="spec-val-main">Auto-returns, charges, resumes</div><div class="spec-val-sub">Remembers exact position and coverage map</div></td></tr>
+          <tr><td>Dock Power</td><td><div class="spec-val-main">100–240V AC · 50/60Hz</div><div class="spec-val-sub">Max 180W during mop wash · Standby 6W</div></td></tr>
+        </table>
+      </div>
+      <div class="sp-section" id="spec-connectivity">
+        <div class="sp-section-title">Connectivity</div>
+        <table class="spec-table">
+          <tr><td>Wi-Fi</td><td><div class="spec-val-main">Wi-Fi 6 (802.11ax) · 2.4 GHz + 5 GHz</div></td></tr>
+          <tr><td>Bluetooth</td><td><div class="spec-val-main">Bluetooth 5.3</div></td></tr>
+          <tr><td>App</td><td><div class="spec-val-main">iOS 15+ · Android 10+</div><div class="spec-val-sub">Real-time map · Scheduling · Remote start · OTA updates</div></td></tr>
+          <tr><td>Voice Control</td><td><div class="spec-val-main">Alexa · Google Assistant · Siri Shortcuts</div></td></tr>
+          <tr><td>Updates</td><td><div class="spec-val-main">OTA firmware · Quarterly feature releases</div></td></tr>
+        </table>
+      </div>
+      <div class="sp-section" id="spec-physical">
+        <div class="sp-section-title">Physical Design</div>
+        <table class="spec-table">
+          <tr><td>Robot Dimensions</td><td><div class="spec-val-main">Ø 350 mm × H 98 mm</div></td></tr>
+          <tr><td>Robot Weight</td><td><div class="spec-val-main">3.8 kg</div></td></tr>
+          <tr><td>Dock Dimensions</td><td><div class="spec-val-main">W 360 mm × D 280 mm × H 160 mm</div></td></tr>
+          <tr><td>Dock Weight</td><td><div class="spec-val-main">4.2 kg</div></td></tr>
+          <tr><td>Ingress Protection</td><td><div class="spec-val-main">IP44 — splash proof, dust protected</div></td></tr>
+          <tr><td>Window Track Rail</td><td><div class="spec-val-main">Aluminium extrusion · 2 m included</div><div class="spec-val-sub">No-drill adhesive mount · Extendable to 8 m (accessories)</div></td></tr>
+          <tr><td>Certifications</td><td><div class="spec-val-main">CE · UKCA · RoHS · REACH</div></td></tr>
+        </table>
+      </div>
+      <div class="sp-section" id="spec-colourways">
+        <div class="sp-section-title">Colourways</div>
+        <div class="sp-colourways">
+          <div class="sp-cw dark"><div class="sp-cw-swatch" style="background:radial-gradient(circle at 35% 30%,#3a3a3a,#0a0a0a);border:1px solid #333"></div><div><div class="sp-cw-name">Obsidian</div><div class="sp-cw-sub">Gloss black chassis · Gold accent hardware</div></div></div>
+          <div class="sp-cw light"><div class="sp-cw-swatch" style="background:radial-gradient(circle at 35% 30%,#ffffff,#d8d8d8);border:1px solid #d0d0d0"></div><div><div class="sp-cw-name">Pearl</div><div class="sp-cw-sub">Gloss white chassis · Blue accent hardware</div></div></div>
+        </div>
+        <p style="font-size:.84rem;color:var(--mid);line-height:1.7">Both colourways are identical in specification. The Obsidian edition features gold-anodised aluminium hardware. The Pearl edition features brushed blue-steel hardware.</p>
+      </div>
+      <div class="sp-section" id="spec-pricing">
+        <div class="sp-section-title">Pricing & What's In The Box</div>
+        <table class="spec-table">
+          <tr><td>X1 Pro — Obsidian</td><td><div class="spec-val-main">€999 · £859</div><div class="spec-val-sub">Free next-day delivery · 60-day returns · 2-year warranty</div></td></tr>
+          <tr><td>X1 Pro — Pearl</td><td><div class="spec-val-main">€999 · £859</div><div class="spec-val-sub">Free next-day delivery · 60-day returns · 2-year warranty</div></td></tr>
+          <tr><td>In the box</td><td><div class="spec-val-main">Robot · Dock station · 2m track rail · 6 scent cartridges</div><div class="spec-val-sub">Power cable · Adhesive track mounts · Quick start guide</div></td></tr>
+          <tr><td>Accessories</td><td><div class="spec-val-main">Spare mop pad set (×4) — €29</div><div class="spec-val-sub">Scent 3-pack — €24 · Track extension (2m) — €39</div></td></tr>
+        </table>
+        <div style="margin-top:32px;display:flex;gap:14px">
+          <button class="btn btn-dark" style="font-size:.72rem" onclick="openCheckout('obsidian')">Order Obsidian — €999</button>
+          <button class="btn btn-outline-dark" style="font-size:.72rem" onclick="openCheckout('pearl')">Order Pearl — €999</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div id="section-app" class="page-section">
+  <div class="app-hero">
+    <div class="app-hero-text">
+      <div class="pill ani-1">JLB App · iOS & Android</div>
+      <h1 class="display-title ani-2">Your home,<br><em>in your hand.</em></h1>
+      <p class="display-sub ani-3">Full control, real-time visibility and intelligent automation — from anywhere in the world.</p>
+    </div>
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="phone-nav"><span style="font-size:.45rem;font-family:'DM Mono',monospace;color:#999;letter-spacing:.1em">JLB</span><span style="font-size:.45rem;font-family:'DM Mono',monospace;color:#ccc;letter-spacing:.1em">9:41</span></div>
+          <div class="phone-title">Good morning, Home</div>
+          <div class="phone-card"><div class="phone-card-label">Status</div><div class="phone-card-val">✓ All clean · Docked</div><div class="phone-bar-wrap"><div class="phone-bar" style="width:85%"></div></div></div>
+          <div class="phone-card"><div class="phone-card-label">Battery</div><div class="phone-card-val">84% · Est. 4h 10m</div><div class="phone-bar-wrap"><div class="phone-bar" style="width:84%;background:#44aa66"></div></div></div>
+          <div class="phone-card"><div class="phone-card-label">Air Quality</div><div class="phone-card-val">Excellent · PM2.5: 3</div><div class="phone-bar-wrap"><div class="phone-bar" style="width:92%;background:#44aa66"></div></div></div>
+          <div class="phone-title" style="margin-top:10px">Quick Start</div>
+          <div class="phone-mode-grid"><div class="phone-mode-btn on">Vacuum</div><div class="phone-mode-btn">Mop</div><div class="phone-mode-btn">Windows</div><div class="phone-mode-btn">Air</div></div>
+        </div>
+      </div>
+      <div class="phone small">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="phone-title">Schedule</div>
+          <div class="phone-card"><div class="phone-card-label">Today · 07:00</div><div class="phone-card-val" style="font-size:.6rem">Floor Vacuum · Full home</div></div>
+          <div class="phone-card" style="border-color:#d4e8d0;background:#f4faf4"><div class="phone-card-label" style="color:#44aa66">Today · 08:30</div><div class="phone-card-val" style="font-size:.6rem;color:#44aa66">Mop · Kitchen + Hall</div></div>
+          <div class="phone-card"><div class="phone-card-label">Fri · 10:00</div><div class="phone-card-val" style="font-size:.6rem">Windows · Living room</div></div>
+          <div class="phone-card"><div class="phone-card-label">Daily · 22:00</div><div class="phone-card-val" style="font-size:.6rem">Scent · Lavender</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-features">
+    <div class="app-feat reveal"><span class="app-feat-icon">🗺️</span><div class="app-feat-name">Live Room Mapping</div><p class="app-feat-desc">Watch a real-time map of your home as the X1 Pro cleans. Set virtual no-go zones, room labels, and cleaning zones with a tap.</p></div>
+    <div class="app-feat reveal reveal-d1"><span class="app-feat-icon">📅</span><div class="app-feat-name">Intelligent Scheduling</div><p class="app-feat-desc">Set weekly schedules by room, by mode, by time. The app learns your routine and suggests optimal cleaning windows.</p></div>
+    <div class="app-feat reveal reveal-d2"><span class="app-feat-icon">📊</span><div class="app-feat-name">Air Quality Dashboard</div><p class="app-feat-desc">Live PM2.5, PM10 and VOC readings for every room. Historical trends and auto-triggered purification when thresholds are exceeded.</p></div>
+    <div class="app-feat reveal reveal-d3"><span class="app-feat-icon">🛒</span><div class="app-feat-name">Auto-Reorder</div><p class="app-feat-desc">The app tracks filter life, mop pad wear and scent cartridge levels. Reorder with one tap — or enable auto-subscription.</p></div>
+    <div class="app-feat reveal reveal-d4"><span class="app-feat-icon">🎙️</span><div class="app-feat-name">Voice & Smart Home</div><p class="app-feat-desc">Works with Alexa, Google Assistant and Siri Shortcuts. Integrates with Apple Home, Google Home and Amazon Alexa out of the box.</p></div>
+    <div class="app-feat reveal reveal-d5"><span class="app-feat-icon">🔔</span><div class="app-feat-name">Notifications & Reports</div><p class="app-feat-desc">Receive a clean summary after every run — area covered, modes used, consumables status, and air quality before and after.</p></div>
+    <div class="app-feat reveal"><span class="app-feat-icon">🌍</span><div class="app-feat-name">Remote Control</div><p class="app-feat-desc">Start, pause and direct the X1 Pro from anywhere in the world. Forgot to run the vacuum before guests arrive? No problem.</p></div>
+    <div class="app-feat reveal reveal-d1"><span class="app-feat-icon">⬆️</span><div class="app-feat-name">OTA Updates</div><p class="app-feat-desc">Quarterly firmware releases add new modes, improve navigation and enhance AI models — your robot keeps getting better after you buy it.</p></div>
+  </div>
+</div>
+
+<script>
+function showTab(name) {
+  document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab-item').forEach(a => { a.classList.remove('active'); a.style.fontWeight='400'; });
+  document.getElementById('section-' + name).classList.add('active');
+  const t = document.getElementById('tab-' + name);
+  if (t) { t.classList.add('active'); t.style.fontWeight='500'; }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  setTimeout(triggerReveals, 50);
+}
+
+function showMode(mode, el) {
+  document.querySelectorAll('.ia-scene').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.ia-tab').forEach(t => t.classList.remove('active'));
+  const scene = document.getElementById('mode-' + mode);
+  if (scene) scene.classList.add('active');
+  if (el) el.classList.add('active');
+}
+
+function showSpec(id, el) {
+  document.querySelectorAll('.sp-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.sp-sidelink').forEach(l => l.classList.remove('active'));
+  document.getElementById('spec-' + id).classList.add('active');
+  if (el) el.classList.add('active');
+}
+
+function triggerReveals() {
+  const tab = document.querySelector('.page-section.active');
+  if (!tab) return;
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+  }, { threshold: 0.1 });
+  tab.querySelectorAll('.reveal').forEach(el => { el.classList.remove('visible'); obs.observe(el); });
+}
+
+let _ckVariant = 'Pearl';
+function openCheckout(variant) {
+  _ckVariant = variant === 'obsidian' ? 'Obsidian' : 'Pearl';
+  document.getElementById('ck-summary-name').textContent = 'JLB X1 Pro · ' + _ckVariant;
+  goStep(1);
+  const ov = document.getElementById('checkout-overlay');
+  ov.style.display = 'flex';
+}
+function closeCheckout() {
+  document.getElementById('checkout-overlay').style.display = 'none';
+}
+function goStep(n) {
+  [1,2,3,4].forEach(i => {
+    const s = document.getElementById('ck-step-' + i);
+    if (s) s.style.display = i === n ? 'block' : 'none';
+    const ind = document.getElementById('ind-' + i);
+    if (ind) { ind.style.borderBottomColor = i <= n ? '#111' : '#ddd'; ind.style.color = i <= n ? '#111' : '#bbb'; }
+  });
+}
+function placeOrder(btn) {
+  btn.textContent = 'Processing…'; btn.style.opacity = '.7'; btn.disabled = true;
+  setTimeout(() => { goStep(4); btn.textContent = '🔒 Place Order — €999'; btn.style.opacity='1'; btn.disabled=false; }, 1800);
+}
+function fmtCard(el) { let v=el.value.replace(/\D/g,'').slice(0,16); el.value=v.match(/.{1,4}/g)?.join(' ')||v; }
+function fmtExpiry(el) { let v=el.value.replace(/\D/g,'').slice(0,4); if(v.length>=3)v=v.slice(0,2)+' / '+v.slice(2); el.value=v; }
+
+document.getElementById('checkout-overlay').addEventListener('click', function(e) { if(e.target===this) closeCheckout(); });
+
+window.addEventListener('load', triggerReveals);
+window.addEventListener('scroll', () => {
+  const tab = document.querySelector('.page-section.active');
+  if (!tab) return;
+  tab.querySelectorAll('.reveal:not(.visible)').forEach(el => { const r=el.getBoundingClientRect(); if(r.top<window.innerHeight-80) el.classList.add('visible'); });
+});
+</script>
+</body>
+</html>
